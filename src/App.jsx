@@ -131,6 +131,9 @@ function App() {
   const [movies, setMovies] = useState(movie_list);
   const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
   const [isOpen, setButton] = useState(true);
+  const getAvg = (array) =>
+    array.reduce((sum, value) => sum + value, 0) / array.length;
+  console.log(getAvg(selectedMovies.map((movies) => movies.Rating)));
   return (
     <>
       <nav className="bg-primary text-white p-2">
@@ -186,10 +189,34 @@ function App() {
               </div>
             )}
           </div>
-          <div className="col-md-3">
+          <div className="col-md-3 ">
             <div className="movie-list">
+              <div className="card mb-2">
+                <div className="card-body">
+                  <h5>Listede {selectedMovies.length} film bulunmaktadır.</h5>
+                  <div className=" d-flex justify-content-between">
+                    <p>
+                      <i className="bi bi-star-fill text-warning me-1"></i>
+                      <span>
+                        {getAvg(
+                          selectedMovies.map((movies) => movies.Rating)
+                        ).toFixed(2)}
+                      </span>
+                    </p>
+                    <p>
+                      <i className="bi bi-hourglass text-warning me-1"></i>
+                      <span>
+                        {getAvg(
+                          selectedMovies.map((movies) => movies.Duration)
+                        )}{" "}
+                        dk
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
               {selectedMovies.map((movie) => (
-                <div className="card-mb-2" key={movie.Id}>
+                <div className="card mb-2" key={movie.Id}>
                   <div className="row">
                     <div className="col-4">
                       <img
