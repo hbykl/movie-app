@@ -128,21 +128,22 @@ const selected_movie_list = [
 ];
 
 export default function App() {
+  const [movies, setMovies] = useState(movie_list);
   return (
     <>
-      <Nav />
-      <Main />
+      <Nav movies={movies} />
+      <Main movies={movies} />
     </>
   );
 }
-function Nav() {
+function Nav({ movies }) {
   return (
     <nav className="bg-primary text-white p-2">
       <div className="container">
         <div className="row align-items-center">
           <Logo />
           <Search />
-          <Result />
+          <Result movies={movies} />
         </div>
       </div>
     </nav>
@@ -167,24 +168,24 @@ function Search() {
     </div>
   );
 }
-function Result() {
+function Result({ movies }) {
   return (
     <div className="col-4 text-end">
-      <strong>5</strong> kayıt bulundu.
+      <strong>{movies.length}</strong> kayıt bulundu.
     </div>
   );
 }
-function Main() {
+function Main({ movies }) {
   return (
     <main className="container">
       <div className="row mt-2">
-        <MovieListContainer />
+        <MovieListContainer movies={movies} />
         <SelectedMovieListContainer />
       </div>
     </main>
   );
 }
-function MovieListContainer() {
+function MovieListContainer({ movies }) {
   const [isOpen, setButton] = useState(true);
   return (
     <div className="col-md-9">
@@ -198,12 +199,11 @@ function MovieListContainer() {
           <i className="bi bi-chevron-down"></i>
         )}
       </button>
-      {isOpen && <MovieList />}
+      {isOpen && <MovieList movies={movies} />}
     </div>
   );
 }
-function MovieList() {
-  const [movies, setMovies] = useState(movie_list);
+function MovieList({ movies }) {
   return (
     <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
       {movies.map((movie) => (
