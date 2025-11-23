@@ -129,6 +129,7 @@ const selected_movie_list = [
 
 export default function App() {
   const [movies, setMovies] = useState(movie_list);
+  const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
   return (
     <>
       <Nav>
@@ -137,9 +138,13 @@ export default function App() {
         <Result movies={movies} />
       </Nav>
       <Main>
-        <MovieListContainer movies={movies}>
+        <ListContainer movies={movies}>
           <MovieList movies={movies}></MovieList>
-        </MovieListContainer>
+        </ListContainer>
+        <ListContainer>
+          <SelectedDetails selectedMovies={selectedMovies} />
+          <SelectedMovieList selectedMovies={selectedMovies} />
+        </ListContainer>
       </Main>
     </>
   );
@@ -182,14 +187,11 @@ function Result({ movies }) {
 function Main({ children }) {
   return (
     <main className="container">
-      <div className="row mt-2">
-        {children}
-        <SelectedMovieListContainer />
-      </div>
+      <div className="row mt-2">{children}</div>
     </main>
   );
 }
-function MovieListContainer({ children }) {
+function ListContainer({ children }) {
   const [isOpen, setButton] = useState(true);
   return (
     <div className="col-md-9">
@@ -232,17 +234,15 @@ function Movie({ movie }) {
     </div>
   );
 }
-function SelectedMovieListContainer() {
-  const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
-  return (
-    <div className="col-md-3 ">
-      <div className="movie-list">
-        <SelectedDetails selectedMovies={selectedMovies} />
-        <SelectedMovieList selectedMovies={selectedMovies} />
-      </div>
-    </div>
-  );
-}
+// function SelectedMovieListContainer() {
+//
+//   return (
+//     <div className="col-md-3 ">
+//       <div className="movie-list">
+//       </div>
+//     </div>
+//   );
+// }
 function SelectedDetails({ selectedMovies }) {
   const getAvg = (array) =>
     array.reduce((sum, value) => sum + value, 0) / array.length;
