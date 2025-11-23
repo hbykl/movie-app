@@ -127,128 +127,175 @@ const selected_movie_list = [
   },
 ];
 
-function App() {
-  const [movies, setMovies] = useState(movie_list);
-  const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
-  const [isOpen, setButton] = useState(true);
-  const getAvg = (array) =>
-    array.reduce((sum, value) => sum + value, 0) / array.length;
-  console.log(getAvg(selectedMovies.map((movies) => movies.Rating)));
+export default function App() {
   return (
     <>
-      <nav className="bg-primary text-white p-2">
-        <div className="container">
-          <div className="row align-items-center">
-            <div className="col-4">Movie App</div>
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Film arayın..."
-              />
-            </div>
-            <div className="col-4 text-end">
-              <strong>5</strong> kayıt bulundu.
-            </div>
-          </div>
-        </div>
-      </nav>
-      <main className="container">
-        <div className="row mt-2">
-          <div className="col-md-9">
-            <button
-              className="btn btn-outline-primary mb-2"
-              onClick={() => setButton((val) => !val)}
-            >
-              {isOpen ? (
-                <i className="bi bi-chevron-up"></i>
-              ) : (
-                <i className="bi bi-chevron-down"></i>
-              )}
-            </button>
-            {isOpen && (
-              <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
-                {movies.map((movie) => (
-                  <div className="col mb-2" key={movie.Id}>
-                    <div className="card">
-                      <img
-                        src={movie.Poster}
-                        alt={movie.Title}
-                        className="card-img-top"
-                      />
-                      <div className="card-body">
-                        <h6 className="card-title">{movie.Title}</h6>
-                        <div>
-                          <i className="bi bi-calendar2-date me-1"></i>
-                          <span>{movie.Year}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="col-md-3 ">
-            <div className="movie-list">
-              <div className="card mb-2">
-                <div className="card-body">
-                  <h5>Listede {selectedMovies.length} film bulunmaktadır.</h5>
-                  <div className=" d-flex justify-content-between">
-                    <p>
-                      <i className="bi bi-star-fill text-warning me-1"></i>
-                      <span>
-                        {getAvg(
-                          selectedMovies.map((movies) => movies.Rating)
-                        ).toFixed(2)}
-                      </span>
-                    </p>
-                    <p>
-                      <i className="bi bi-hourglass text-warning me-1"></i>
-                      <span>
-                        {getAvg(
-                          selectedMovies.map((movies) => movies.Duration)
-                        )}{" "}
-                        dk
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {selectedMovies.map((movie) => (
-                <div className="card mb-2" key={movie.Id}>
-                  <div className="row">
-                    <div className="col-4">
-                      <img
-                        src={movie.Poster}
-                        alt={movie.Title}
-                        className="img-fluid rounded-start"
-                      />
-                    </div>
-                    <div className="col-8 ">
-                      <div className="card-body">
-                        <h6 className="card-title">{movie.Title}</h6>
-                        <div className="d-flex justify-content-between">
-                          <p>
-                            <i className="bi bi-star-fill text-warning"></i>
-                            <span>{movie.Rating}</span>
-                          </p>
-                          <p>
-                            <i className="bi bi-hourglass text-warning"></i>
-                            <span>{movie.Duration} dk</span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </main>
+      <Nav />
+      <Main />
     </>
   );
 }
-
-export default App;
+function Nav() {
+  return (
+    <nav className="bg-primary text-white p-2">
+      <div className="container">
+        <div className="row align-items-center">
+          <Logo />
+          <Search />
+          <Result />
+        </div>
+      </div>
+    </nav>
+  );
+}
+function Logo() {
+  return (
+    <div className="col-4">
+      <i className="bi bi-camera-reels me-2"></i>
+      Movie App
+    </div>
+  );
+}
+function Search() {
+  return (
+    <div className="col-4">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Film arayın..."
+      />
+    </div>
+  );
+}
+function Result() {
+  return (
+    <div className="col-4 text-end">
+      <strong>5</strong> kayıt bulundu.
+    </div>
+  );
+}
+function Main() {
+  return (
+    <main className="container">
+      <div className="row mt-2">
+        <MovieListContainer />
+        <SelectedMovieListContainer />
+      </div>
+    </main>
+  );
+}
+function MovieListContainer() {
+  const [isOpen, setButton] = useState(true);
+  return (
+    <div className="col-md-9">
+      <button
+        className="btn btn-outline-primary mb-2"
+        onClick={() => setButton((val) => !val)}
+      >
+        {isOpen ? (
+          <i className="bi bi-chevron-up"></i>
+        ) : (
+          <i className="bi bi-chevron-down"></i>
+        )}
+      </button>
+      {isOpen && <MovieList />}
+    </div>
+  );
+}
+function MovieList() {
+  const [movies, setMovies] = useState(movie_list);
+  return (
+    <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
+      {movies.map((movie) => (
+        <Movie movie={movie} key={movie.Id} />
+      ))}
+    </div>
+  );
+}
+function Movie({ movie }) {
+  return (
+    <div className="col mb-2">
+      <div className="card">
+        <img src={movie.Poster} alt={movie.Title} className="card-img-top" />
+        <div className="card-body">
+          <h6 className="card-title">{movie.Title}</h6>
+          <div>
+            <i className="bi bi-calendar2-date me-1"></i>
+            <span>{movie.Year}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function SelectedMovieListContainer() {
+  const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
+  return (
+    <div className="col-md-3 ">
+      <div className="movie-list">
+        <SelectedDetails selectedMovies={selectedMovies} />
+        <SelectedMovieList selectedMovies={selectedMovies} />
+      </div>
+    </div>
+  );
+}
+function SelectedDetails({ selectedMovies }) {
+  const getAvg = (array) =>
+    array.reduce((sum, value) => sum + value, 0) / array.length;
+  return (
+    <div className="card mb-2">
+      <div className="card-body">
+        <h5>Listede {selectedMovies.length} film bulunmaktadır.</h5>
+        <div className=" d-flex justify-content-between">
+          <p>
+            <i className="bi bi-star-fill text-warning me-1"></i>
+            <span>
+              {getAvg(selectedMovies.map((movies) => movies.Rating)).toFixed(2)}
+            </span>
+          </p>
+          <p>
+            <i className="bi bi-hourglass text-warning me-1"></i>
+            <span>
+              {getAvg(selectedMovies.map((movies) => movies.Duration))} dk
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+function SelectedMovieList({ selectedMovies }) {
+  return selectedMovies.map((movie) => (
+    <SelectedMovie movie={movie} key={movie.Id} />
+  ));
+}
+function SelectedMovie({ movie }) {
+  return (
+    <div className="card mb-2">
+      <div className="row">
+        <div className="col-4">
+          <img
+            src={movie.Poster}
+            alt={movie.Title}
+            className="img-fluid rounded-start"
+          />
+        </div>
+        <div className="col-8 ">
+          <div className="card-body">
+            <h6 className="card-title">{movie.Title}</h6>
+            <div className="d-flex justify-content-between">
+              <p>
+                <i className="bi bi-star-fill text-warning"></i>
+                <span>{movie.Rating}</span>
+              </p>
+              <p>
+                <i className="bi bi-hourglass text-warning"></i>
+                <span>{movie.Duration} dk</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
