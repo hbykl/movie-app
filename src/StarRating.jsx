@@ -19,26 +19,34 @@ export default function StarRating({
   size = "36",
 }) {
   const [click, setClick] = useState(0);
+  const [onHover, SetOnHover] = useState(0);
   return (
     <div style={containerStyle}>
       <div style={itemContainerStyle}>
         {Array.from({ length: maxRating }, (val, i) => (
           <Star
-            fill={click >= i + 1}
-            onRating={() => setClick(i + 1)}
+            fill={onHover ? onHover >= i + 1 : click >= i + 1}
             color={color}
             size={size}
+            onRating={() => setClick(i + 1)}
+            onHoverEnter={() => SetOnHover(i + 1)}
+            onHoverLeave={() => SetOnHover(0)}
+            key={i}
           />
         ))}
       </div>
-      <p style={textStyle}>{click || ""}</p>
+      <p style={textStyle}>{onHover || click || ""}</p>
     </div>
   );
 }
 
-function Star({ onRating, fill, color, size }) {
+function Star({ onRating, fill, color, size, onHoverEnter, onHoverLeave }) {
   return fill ? (
-    <span onClick={onRating}>
+    <span
+      onClick={onRating}
+      onMouseEnter={onHoverEnter}
+      onMouseLeave={onHoverLeave}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={size}
@@ -50,7 +58,11 @@ function Star({ onRating, fill, color, size }) {
       </svg>
     </span>
   ) : (
-    <span onClick={onRating}>
+    <span
+      onClick={onRating}
+      onMouseEnter={onHoverEnter}
+      onMouseLeave={onHoverLeave}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={size}
