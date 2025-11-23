@@ -131,20 +131,24 @@ export default function App() {
   const [movies, setMovies] = useState(movie_list);
   return (
     <>
-      <Nav movies={movies} />
-      <Main movies={movies} />
+      <Nav>
+        <Logo />
+        <Search />
+        <Result movies={movies} />
+      </Nav>
+      <Main>
+        <MovieListContainer movies={movies}>
+          <MovieList movies={movies}></MovieList>
+        </MovieListContainer>
+      </Main>
     </>
   );
 }
-function Nav({ movies }) {
+function Nav({ children }) {
   return (
     <nav className="bg-primary text-white p-2">
       <div className="container">
-        <div className="row align-items-center">
-          <Logo />
-          <Search />
-          <Result movies={movies} />
-        </div>
+        <div className="row align-items-center">{children}</div>
       </div>
     </nav>
   );
@@ -175,17 +179,17 @@ function Result({ movies }) {
     </div>
   );
 }
-function Main({ movies }) {
+function Main({ children }) {
   return (
     <main className="container">
       <div className="row mt-2">
-        <MovieListContainer movies={movies} />
+        {children}
         <SelectedMovieListContainer />
       </div>
     </main>
   );
 }
-function MovieListContainer({ movies }) {
+function MovieListContainer({ children }) {
   const [isOpen, setButton] = useState(true);
   return (
     <div className="col-md-9">
@@ -199,7 +203,7 @@ function MovieListContainer({ movies }) {
           <i className="bi bi-chevron-down"></i>
         )}
       </button>
-      {isOpen && <MovieList movies={movies} />}
+      {isOpen && children}
     </div>
   );
 }
