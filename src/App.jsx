@@ -130,6 +130,7 @@ const selected_movie_list = [
 function App() {
   const [movies, setMovies] = useState(movie_list);
   const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
+  const [isOpen, setButton] = useState(true);
   return (
     <>
       <nav className="bg-primary text-white p-2">
@@ -152,26 +153,38 @@ function App() {
       <main className="container">
         <div className="row mt-2">
           <div className="col-md-9">
-            <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
-              {movies.map((movie) => (
-                <div className="col mb-2" key={movie.Id}>
-                  <div className="card">
-                    <img
-                      src={movie.Poster}
-                      alt={movie.Title}
-                      className="card-img-top"
-                    />
-                    <div className="card-body">
-                      <h6 className="card-title">{movie.Title}</h6>
-                      <div>
-                        <i className="bi bi-calendar2-date me-1"></i>
-                        <span>{movie.Year}</span>
+            <button
+              className="btn btn-outline-primary mb-2"
+              onClick={() => setButton((val) => !val)}
+            >
+              {isOpen ? (
+                <i className="bi bi-chevron-up"></i>
+              ) : (
+                <i className="bi bi-chevron-down"></i>
+              )}
+            </button>
+            {isOpen && (
+              <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
+                {movies.map((movie) => (
+                  <div className="col mb-2" key={movie.Id}>
+                    <div className="card">
+                      <img
+                        src={movie.Poster}
+                        alt={movie.Title}
+                        className="card-img-top"
+                      />
+                      <div className="card-body">
+                        <h6 className="card-title">{movie.Title}</h6>
+                        <div>
+                          <i className="bi bi-calendar2-date me-1"></i>
+                          <span>{movie.Year}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="col-md-3">
             <div className="movie-list">
