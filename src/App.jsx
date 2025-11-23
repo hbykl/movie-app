@@ -138,13 +138,17 @@ export default function App() {
         <Result movies={movies} />
       </Nav>
       <Main>
-        <ListContainer movies={movies}>
-          <MovieList movies={movies}></MovieList>
-        </ListContainer>
-        <ListContainer>
-          <SelectedDetails selectedMovies={selectedMovies} />
-          <SelectedMovieList selectedMovies={selectedMovies} />
-        </ListContainer>
+        <div className="col-md-9">
+          <ListContainer movies={movies}>
+            <MovieList movies={movies}></MovieList>
+          </ListContainer>
+        </div>
+        <div className="col-md-3">
+          <ListContainer>
+            <SelectedDetails selectedMovies={selectedMovies} />
+            <SelectedMovieList selectedMovies={selectedMovies} />
+          </ListContainer>
+        </div>
       </Main>
     </>
   );
@@ -194,7 +198,7 @@ function Main({ children }) {
 function ListContainer({ children }) {
   const [isOpen, setButton] = useState(true);
   return (
-    <div className="col-md-9">
+    <>
       <button
         className="btn btn-outline-primary mb-2"
         onClick={() => setButton((val) => !val)}
@@ -206,7 +210,7 @@ function ListContainer({ children }) {
         )}
       </button>
       {isOpen && children}
-    </div>
+    </>
   );
 }
 function MovieList({ movies }) {
