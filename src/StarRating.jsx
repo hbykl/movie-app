@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PropTypes } from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -12,6 +13,11 @@ const itemContainerStyle = {
 const textStyle = {
   margin: "0",
   fontSize: "2rem",
+};
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.string,
 };
 export default function StarRating({
   maxRating = 5,
