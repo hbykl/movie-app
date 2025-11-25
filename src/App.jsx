@@ -127,9 +127,17 @@ const selected_movie_list = [
   },
 ];
 
+const api_key = "242fc01a5db5c09e93d411a0770051e3";
+const query = "First";
 export default function App() {
-  const [movies, setMovies] = useState(movie_list);
-  const [selectedMovies, setSelectedMovies] = useState(selected_movie_list);
+  const [movies, setMovies] = useState([]);
+  const [selectedMovies, setSelectedMovies] = useState([]);
+  fetch(
+    `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
+  )
+    .then((res) => res.json())
+    .then((res) => setMovies(res.results));
+
   return (
     <>
       <Nav>
@@ -217,7 +225,7 @@ function MovieList({ movies }) {
   return (
     <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
       {movies.map((movie) => (
-        <Movie movie={movie} key={movie.Id} />
+        <Movie movie={movie} key={movie.id} />
       ))}
     </div>
   );
@@ -225,13 +233,21 @@ function MovieList({ movies }) {
 function Movie({ movie }) {
   return (
     <div className="col mb-2">
-      <div className="card">
-        <img src={movie.Poster} alt={movie.Title} className="card-img-top" />
+      <div className="card ">
+        <img
+          src={
+            movie.poster_path
+              ? `https://image.tmdb.org/t/p/w500` + movie.poster_path
+              : "/img/no-image.jpg"
+          }
+          alt={movie.title}
+          className="card-img-top"
+        />
         <div className="card-body">
-          <h6 className="card-title">{movie.Title}</h6>
+          <h6 className="card-title">{movie.title}</h6>
           <div>
             <i className="bi bi-calendar2-date me-1"></i>
-            <span>{movie.Year}</span>
+            <span>{movie.release_date}</span>
           </div>
         </div>
       </div>
