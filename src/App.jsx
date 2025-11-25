@@ -2,22 +2,35 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 const api_key = "242fc01a5db5c09e93d411a0770051e3";
-const query = "Hi";
+const query = "red";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(function () //first render
   {
-    setLoading(true);
     async function getMovies() {
-      const data = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
-      );
-      const result = await data.json();
-      setMovies(result.results);
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
+        );
+        if (!res.ok) {
+          throw new Error("Bilinmeyen bir hata oluştu");
+        }
+        const data = await res.json();
+        if (data.total_results === 0) {
+          throw new Error("Film Bulunamadı");
+        }
+        setMovies(data.results);
+      } catch (e) {
+        console.log(e.message);
+        setError(e.message);
+      }
       setLoading(false);
     }
     getMovies();
@@ -38,11 +51,11 @@ export default function App() {
       <Main>
         <div className="col-md-9">
           <ListContainer movies={movies}>
-            {loading ? (
-              <Loading />
-            ) : (
+            {loading && <Loading />}
+            {!loading && !error && (
               <MovieList movies={movies} onClick={handleClickMovie}></MovieList>
             )}
+            {error && <ErrorMessage message={error}></ErrorMessage>}
           </ListContainer>
         </div>
         <div className="col-md-3">
@@ -71,6 +84,10 @@ function Loading() {
       <span className="sr-only"></span>
     </div>
   );
+}
+
+function ErrorMessage({ message }) {
+  return <div className="alert alert-danger">{message}</div>;
 }
 
 function Logo() {
@@ -173,7 +190,7 @@ function Movie({ movie, onClick }) {
 // }
 function SelectedDetails({ selectedMovies }) {
   const getAvg = (array) =>
-    array.reduce((sum, value) => sum + value, 0) / array.length;
+    array.reduce((sum, value) => sum + value / array.length, 0);
   return (
     <div className="card mb-2">
       <div className="card-body">
