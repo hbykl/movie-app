@@ -2,39 +2,47 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 const api_key = "242fc01a5db5c09e93d411a0770051e3";
-const query = "red";
 
 export default function App() {
+  const [query, setQuery] = useState("film");
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(function () //first render
-  {
-    async function getMovies() {
-      try {
-        setLoading(true);
-        setError("");
-        const res = await fetch(
-          `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
-        );
-        if (!res.ok) {
-          throw new Error("Bilinmeyen bir hata oluştu");
+  useEffect(
+    function () //first render
+    {
+      async function getMovies() {
+        try {
+          setLoading(true);
+          setError("");
+          const res = await fetch(
+            `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
+          );
+          if (!res.ok) {
+            throw new Error("Bilinmeyen bir hata oluştu");
+          }
+          const data = await res.json();
+          if (data.total_results === 0) {
+            throw new Error("Film Bulunamadı");
+          }
+          setMovies(data.results);
+        } catch (e) {
+          console.log(e.message);
+          setError(e.message);
         }
-        const data = await res.json();
-        if (data.total_results === 0) {
-          throw new Error("Film Bulunamadı");
-        }
-        setMovies(data.results);
-      } catch (e) {
-        console.log(e.message);
-        setError(e.message);
+        setLoading(false);
       }
-      setLoading(false);
-    }
-    getMovies();
-  }, []);
+      if (query.length < 3) {
+        setError("");
+        setMovies([]);
+        return;
+      }
+      getMovies();
+    },
+    [query]
+  );
 
   const handleClickMovie = (movie, movieId) => {
     const exist = selectedMovies.some((m) => m.id == movieId);
@@ -45,7 +53,7 @@ export default function App() {
     <>
       <Nav>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <Result movies={movies} />
       </Nav>
       <Main>
@@ -98,11 +106,13 @@ function Logo() {
     </div>
   );
 }
-function Search() {
+function Search({ query, setQuery }) {
   return (
     <div className="col-4">
       <input
         type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
         className="form-control"
         placeholder="Film arayın..."
       />
