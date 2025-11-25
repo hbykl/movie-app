@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useState } from "react";
 const movie_list = [
   {
@@ -132,11 +133,14 @@ const query = "First";
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
-  fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
-  )
-    .then((res) => res.json())
-    .then((res) => setMovies(res.results));
+  useEffect(function () //first render
+  {
+    fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
+    )
+      .then((res) => res.json())
+      .then((res) => setMovies(res.results));
+  }, []);
 
   return (
     <>
