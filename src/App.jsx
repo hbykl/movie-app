@@ -2,18 +2,23 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 const api_key = "242fc01a5db5c09e93d411a0770051e3";
-const query = "First";
+const query = "Hi";
+
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(function () //first render
   {
+    setLoading(true);
     async function getMovies() {
       const data = await fetch(
         `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
       );
       const result = await data.json();
       setMovies(result.results);
+      setLoading(false);
     }
     getMovies();
   }, []);
@@ -33,7 +38,11 @@ export default function App() {
       <Main>
         <div className="col-md-9">
           <ListContainer movies={movies}>
-            <MovieList movies={movies} onClick={handleClickMovie}></MovieList>
+            {loading ? (
+              <Loading />
+            ) : (
+              <MovieList movies={movies} onClick={handleClickMovie}></MovieList>
+            )}
           </ListContainer>
         </div>
         <div className="col-md-3">
@@ -55,6 +64,15 @@ function Nav({ children }) {
     </nav>
   );
 }
+
+function Loading() {
+  return (
+    <div className="spinner-border text-info" role="status">
+      <span className="sr-only"></span>
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <div className="col-4">
