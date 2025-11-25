@@ -141,6 +141,10 @@ export default function App() {
       .then((res) => res.json())
       .then((res) => setMovies(res.results));
   }, []);
+  const handleClickMovie = (movie, movieId) => {
+    const exist = selectedMovies.some((m) => m.id == movieId);
+    !exist && setSelectedMovies([...selectedMovies, movie]);
+  };
 
   return (
     <>
@@ -152,7 +156,7 @@ export default function App() {
       <Main>
         <div className="col-md-9">
           <ListContainer movies={movies}>
-            <MovieList movies={movies}></MovieList>
+            <MovieList movies={movies} onClick={handleClickMovie}></MovieList>
           </ListContainer>
         </div>
         <div className="col-md-3">
@@ -225,19 +229,24 @@ function ListContainer({ children }) {
     </>
   );
 }
-function MovieList({ movies }) {
+function MovieList({ movies, onClick }) {
   return (
     <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
       {movies.map((movie) => (
-        <Movie movie={movie} key={movie.id} />
+        <Movie movie={movie} key={movie.id} onClick={onClick} />
       ))}
     </div>
   );
 }
-function Movie({ movie }) {
+function Movie({ movie, onClick }) {
   return (
     <div className="col mb-2">
-      <div className="card ">
+      <div
+        className="card "
+        onClick={() => {
+          onClick(movie, movie.id);
+        }}
+      >
         <img
           src={
             movie.poster_path
@@ -278,7 +287,9 @@ function SelectedDetails({ selectedMovies }) {
           <p>
             <i className="bi bi-star-fill text-warning me-1"></i>
             <span>
-              {getAvg(selectedMovies.map((movies) => movies.Rating)).toFixed(2)}
+              {getAvg(
+                selectedMovies.map((movies) => movies.vote_average)
+              ).toFixed(2)}
             </span>
           </p>
           <p>
@@ -294,7 +305,7 @@ function SelectedDetails({ selectedMovies }) {
 }
 function SelectedMovieList({ selectedMovies }) {
   return selectedMovies.map((movie) => (
-    <SelectedMovie movie={movie} key={movie.Id} />
+    <SelectedMovie movie={movie} key={movie.id} />
   ));
 }
 function SelectedMovie({ movie }) {
@@ -303,18 +314,22 @@ function SelectedMovie({ movie }) {
       <div className="row">
         <div className="col-4">
           <img
-            src={movie.Poster}
-            alt={movie.Title}
+            src={
+              movie.poster_path
+                ? `https://image.tmdb.org/t/p/w500` + movie.poster_path
+                : "/img/no-image.jpg"
+            }
+            alt={movie.title}
             className="img-fluid rounded-start"
           />
         </div>
         <div className="col-8 ">
           <div className="card-body">
-            <h6 className="card-title">{movie.Title}</h6>
+            <h6 className="card-title">{movie.title}</h6>
             <div className="d-flex justify-content-between">
               <p>
                 <i className="bi bi-star-fill text-warning"></i>
-                <span>{movie.Rating}</span>
+                <span>{movie.vote_average}</span>
               </p>
               <p>
                 <i className="bi bi-hourglass text-warning"></i>
