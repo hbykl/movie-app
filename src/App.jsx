@@ -7,6 +7,7 @@ export default function App() {
   const [query, setQuery] = useState("film");
   const [movies, setMovies] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,11 +45,18 @@ export default function App() {
     [query]
   );
 
-  const handleClickMovie = (movie, movieId) => {
-    const exist = selectedMovies.some((m) => m.id == movieId);
-    exist
-      ? setSelectedMovies(selectedMovies.filter((movie) => movie.id != movieId))
-      : setSelectedMovies([...selectedMovies, movie]);
+  const handleClickMovie = (movie) => {
+    const exist = selectedMovies.some((m) => m.id == movie.id);
+    if (!exist) {
+      setSelectedMovies([...selectedMovies, movie]);
+      setSelectedMovie();
+    } else {
+      setSelectedMovie();
+    }
+  };
+
+  const handleSelectMovie = (movie) => {
+    selectedMovie === movie ? setSelectedMovie() : setSelectedMovie(movie);
   };
 
   return (
@@ -65,8 +73,9 @@ export default function App() {
             {!loading && !error && (
               <MovieList
                 movies={movies}
-                onClick={handleClickMovie}
-                selectedMovie={selectedMovies}
+                selectedMovies={selectedMovies}
+                selectedMovie={selectedMovie}
+                handleSelectMovie={handleSelectMovie}
               ></MovieList>
             )}
             {error && <ErrorMessage message={error}></ErrorMessage>}
@@ -78,7 +87,15 @@ export default function App() {
               selectedMovies={selectedMovies}
               setSelectedMovies={setSelectedMovies}
             />
-            <SelectedMovieList selectedMovies={selectedMovies} />
+            {selectedMovie ? (
+              <AskSelected
+                movie={selectedMovie}
+                onClick={handleClickMovie}
+                setSelectedMovie={setSelectedMovie}
+              />
+            ) : (
+              <SelectedMovieList selectedMovies={selectedMovies} />
+            )}
           </ListContainer>
         </div>
       </Main>
@@ -160,30 +177,37 @@ function ListContainer({ children }) {
     </>
   );
 }
-function MovieList({ movies, onClick, selectedMovie }) {
+function MovieList({
+  movies,
+  selectedMovies,
+  selectedMovie,
+  handleSelectMovie,
+}) {
   return (
     <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
       {movies.map((movie) => (
         <Movie
           movie={movie}
           key={movie.id}
-          onClick={onClick}
-          selectedMovies={selectedMovie}
+          selectedMovies={selectedMovies}
+          selectedMovie={selectedMovie}
+          handleSelectMovie={handleSelectMovie}
         />
       ))}
     </div>
   );
 }
-function Movie({ movie, onClick, selectedMovies }) {
+function Movie({ movie, selectedMovies, selectedMovie, handleSelectMovie }) {
   return (
     <div className="col mb-2">
       <div
         className={`card movie ${
-          selectedMovies.some((m) => m.id === movie.id) && "selected-movie"
+          selectedMovies.some((m) => m.id === movie.id) ||
+          selectedMovie === movie
+            ? "selected-movie"
+            : ""
         }`}
-        onClick={() => {
-          onClick(movie, movie.id);
-        }}
+        onClick={() => handleSelectMovie(movie)}
       >
         <img
           src={
@@ -268,6 +292,35 @@ function SelectedMovie({ movie }) {
               <i className="bi bi-star-fill text-warning"></i>
               <span>{movie.vote_average}</span>
             </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AskSelected({ movie, setSelectedMovie, onClick }) {
+  return (
+    <div className="card mb-2">
+      <div className="row">
+        <div className="col-4">
+          <img
+            src={
+              movie.poster_path
+                ? `https://image.tmdb.org/t/p/w500` + movie.poster_path
+                : "/img/no-image.jpg"
+            }
+            alt={movie.title}
+            className="img-fluid rounded-start"
+          />
+        </div>
+        <div className="col-8 ">
+          <div className="card-body">
+            <h6 className="card-title">{movie.title}</h6>
+            <p>
+              <i className="bi bi-star-fill text-warning"></i>
+              <span>{movie.vote_average}</span>
+            </p>
             <p>{movie.overview}</p>
             <p>
               {movie.genre_ids?.map((genre) => (
@@ -276,6 +329,17 @@ function SelectedMovie({ movie }) {
                 </span>
               ))}
             </p>
+          </div>
+          <div className="d-flex justify-content-between me-2">
+            <button className="btn btn-info" onClick={() => onClick(movie)}>
+              Listeye Ekle
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => setSelectedMovie()}
+            >
+              Kapat
+            </button>
           </div>
         </div>
       </div>
