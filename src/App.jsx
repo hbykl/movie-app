@@ -46,7 +46,9 @@ export default function App() {
 
   const handleClickMovie = (movie, movieId) => {
     const exist = selectedMovies.some((m) => m.id == movieId);
-    !exist && setSelectedMovies([...selectedMovies, movie]);
+    exist
+      ? setSelectedMovies(selectedMovies.filter((movie) => movie.id != movieId))
+      : setSelectedMovies([...selectedMovies, movie]);
   };
 
   return (
@@ -61,7 +63,11 @@ export default function App() {
           <ListContainer movies={movies}>
             {loading && <Loading />}
             {!loading && !error && (
-              <MovieList movies={movies} onClick={handleClickMovie}></MovieList>
+              <MovieList
+                movies={movies}
+                onClick={handleClickMovie}
+                selectedMovie={selectedMovies}
+              ></MovieList>
             )}
             {error && <ErrorMessage message={error}></ErrorMessage>}
           </ListContainer>
@@ -151,20 +157,27 @@ function ListContainer({ children }) {
     </>
   );
 }
-function MovieList({ movies, onClick }) {
+function MovieList({ movies, onClick, selectedMovie }) {
   return (
     <div className="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
       {movies.map((movie) => (
-        <Movie movie={movie} key={movie.id} onClick={onClick} />
+        <Movie
+          movie={movie}
+          key={movie.id}
+          onClick={onClick}
+          selectedMovies={selectedMovie}
+        />
       ))}
     </div>
   );
 }
-function Movie({ movie, onClick }) {
+function Movie({ movie, onClick, selectedMovies }) {
   return (
     <div className="col mb-2">
       <div
-        className="card "
+        className={`card movie ${
+          selectedMovies.some((m) => m.id === movie.id) && "selected-movie"
+        }`}
         onClick={() => {
           onClick(movie, movie.id);
         }}
