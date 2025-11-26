@@ -74,7 +74,10 @@ export default function App() {
         </div>
         <div className="col-md-3">
           <ListContainer>
-            <SelectedDetails selectedMovies={selectedMovies} />
+            <SelectedDetails
+              selectedMovies={selectedMovies}
+              setSelectedMovies={setSelectedMovies}
+            />
             <SelectedMovieList selectedMovies={selectedMovies} />
           </ListContainer>
         </div>
@@ -211,7 +214,7 @@ function Movie({ movie, onClick, selectedMovies }) {
 //     </div>
 //   );
 // }
-function SelectedDetails({ selectedMovies }) {
+function SelectedDetails({ selectedMovies, setSelectedMovies }) {
   const getAvg = (array) =>
     array.reduce((sum, value) => sum + value / array.length, 0);
   return (
@@ -227,12 +230,12 @@ function SelectedDetails({ selectedMovies }) {
               ).toFixed(2)}
             </span>
           </p>
-          <p>
-            <i className="bi bi-hourglass text-warning me-1"></i>
-            <span>
-              {getAvg(selectedMovies.map((movies) => movies.Duration))} dk
-            </span>
-          </p>
+          <button
+            className=" btn btn-danger text-white"
+            onClick={() => setSelectedMovies([])}
+          >
+            <i className="bi bi-trash-fill"></i> Temizle
+          </button>
         </div>
       </div>
     </div>
@@ -261,16 +264,18 @@ function SelectedMovie({ movie }) {
         <div className="col-8 ">
           <div className="card-body">
             <h6 className="card-title">{movie.title}</h6>
-            <div className="d-flex justify-content-between">
-              <p>
-                <i className="bi bi-star-fill text-warning"></i>
-                <span>{movie.vote_average}</span>
-              </p>
-              <p>
-                <i className="bi bi-hourglass text-warning"></i>
-                <span>{movie.Duration} dk</span>
-              </p>
-            </div>
+            <p>
+              <i className="bi bi-star-fill text-warning"></i>
+              <span>{movie.vote_average}</span>
+            </p>
+            <p>{movie.overview}</p>
+            <p>
+              {movie.genre_ids?.map((genre) => (
+                <span key={genre} className="badge text-bg-primary me-1">
+                  {genre}
+                </span>
+              ))}
+            </p>
           </div>
         </div>
       </div>
