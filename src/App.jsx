@@ -11,18 +11,32 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [rate, setRate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
+
+  function nextPage() {
+    currentPage + 1 > totalPage
+      ? setCurrentPage(1)
+      : setCurrentPage(currentPage + 1);
+  }
+  function previousPage() {
+    currentPage - 1 <= 0
+      ? setCurrentPage(totalPage)
+      : setCurrentPage(currentPage - 1);
+  }
 
   useEffect(
     function () //first render
     {
       const controller = new AbortController();
       const signal = controller.signal;
-      async function getMovies() {
+      async function getMovies(page) {
         try {
           setLoading(true);
           setError("");
           const res = await fetch(
-            `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`,
+            `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}&page=${page}`,
             { signal: signal }
           );
           if (!res.ok) {
@@ -33,6 +47,8 @@ export default function App() {
             throw new Error("Film Bulunamadı");
           }
           setMovies(data.results);
+          setTotalPage(data.total_pages);
+          setTotalResults(data.total_results);
         } catch (e) {
           if (e.name === "AbortError") {
             console.log(e.message);
@@ -47,12 +63,12 @@ export default function App() {
         setMovies([]);
         return;
       }
-      getMovies();
+      getMovies(currentPage);
       return () => {
         controller.abort();
       };
     },
-    [query]
+    [query, currentPage]
   );
 
   const handleClickMovie = (movie) => {
@@ -86,19 +102,27 @@ export default function App() {
       <Nav>
         <Logo />
         <Search query={query} setQuery={setQuery} />
-        <Result movies={movies} />
+        <Result totalResults={totalResults} />
       </Nav>
       <Main>
         <div className="col-md-9">
           <ListContainer movies={movies}>
             {loading && <Loading />}
-            {!loading && !error && (
-              <MovieList
-                movies={movies}
-                selectedMovies={selectedMovies}
-                selectedMovie={selectedMovie}
-                handleSelectMovie={handleSelectMovie}
-              ></MovieList>
+            {!loading && !error && movies.length > 0 && (
+              <>
+                <MovieList
+                  movies={movies}
+                  selectedMovies={selectedMovies}
+                  selectedMovie={selectedMovie}
+                  handleSelectMovie={handleSelectMovie}
+                ></MovieList>
+                <Pagination
+                  nextPage={nextPage}
+                  previousPage={previousPage}
+                  totalPage={totalPage}
+                  currentPage={currentPage}
+                />
+              </>
             )}
             {error && <ErrorMessage message={error}></ErrorMessage>}
           </ListContainer>
@@ -129,6 +153,29 @@ export default function App() {
     </>
   );
 }
+
+function Pagination({ nextPage, previousPage, totalPage, currentPage }) {
+  return (
+    <nav>
+      <ul className="pagination d-flex justify-content-between">
+        <li className="page-item">
+          <a className="page-link" href="#" onClick={previousPage}>
+            Geri
+          </a>
+        </li>
+        <p>
+          Toplam {totalPage} sayfada {currentPage}. sayfayı görüntülüyorsunuz.
+        </p>
+        <li className="page-item">
+          <a className="page-link" href="#" onClick={nextPage}>
+            İleri
+          </a>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
 function Nav({ children }) {
   return (
     <nav className="bg-primary text-white p-2">
@@ -172,10 +219,10 @@ function Search({ query, setQuery }) {
     </div>
   );
 }
-function Result({ movies }) {
+function Result({ totalResults }) {
   return (
     <div className="col-4 text-end">
-      <strong>{movies.length}</strong> kayıt bulundu.
+      <strong>{totalResults}</strong> kayıt bulundu.
     </div>
   );
 }
