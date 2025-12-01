@@ -59,6 +59,10 @@ export default function App() {
     selectedMovie === movie ? setSelectedMovie() : setSelectedMovie(movie);
   };
 
+  const handleDeleteMovie = (id) => {
+    setSelectedMovies(selectedMovies.filter((m) => m.id !== id));
+  };
+
   return (
     <>
       <Nav>
@@ -92,9 +96,13 @@ export default function App() {
                 movie={selectedMovie}
                 onClick={handleClickMovie}
                 setSelectedMovie={setSelectedMovie}
+                selectedMovies={selectedMovies}
               />
             ) : (
-              <SelectedMovieList selectedMovies={selectedMovies} />
+              <SelectedMovieList
+                selectedMovies={selectedMovies}
+                handleDeleteMovie={handleDeleteMovie}
+              />
             )}
           </ListContainer>
         </div>
@@ -265,12 +273,16 @@ function SelectedDetails({ selectedMovies, setSelectedMovies }) {
     </div>
   );
 }
-function SelectedMovieList({ selectedMovies }) {
+function SelectedMovieList({ selectedMovies, handleDeleteMovie }) {
   return selectedMovies.map((movie) => (
-    <SelectedMovie movie={movie} key={movie.id} />
+    <SelectedMovie
+      movie={movie}
+      key={movie.id}
+      handleDeleteMovie={handleDeleteMovie}
+    />
   ));
 }
-function SelectedMovie({ movie }) {
+function SelectedMovie({ movie, handleDeleteMovie }) {
   return (
     <div className="card mb-2">
       <div className="row">
@@ -292,6 +304,12 @@ function SelectedMovie({ movie }) {
               <i className="bi bi-star-fill text-warning"></i>
               <span>{movie.vote_average}</span>
             </p>
+            <button
+              className="btn btn-danger pt-1 pb-1"
+              onClick={() => handleDeleteMovie(movie.id)}
+            >
+              Sil
+            </button>
           </div>
         </div>
       </div>
@@ -299,7 +317,7 @@ function SelectedMovie({ movie }) {
   );
 }
 
-function AskSelected({ movie, setSelectedMovie, onClick }) {
+function AskSelected({ movie, setSelectedMovie, onClick, selectedMovies }) {
   return (
     <div className="card mb-2">
       <div className="row">
@@ -331,9 +349,14 @@ function AskSelected({ movie, setSelectedMovie, onClick }) {
             </p>
           </div>
           <div className="d-flex justify-content-between me-2">
-            <button className="btn btn-info" onClick={() => onClick(movie)}>
-              Listeye Ekle
-            </button>
+            {selectedMovies.some((m) => m.id == movie.id) ? (
+              <p>Film Listenizde Bulunmaktadır.</p>
+            ) : (
+              <button className="btn btn-info" onClick={() => onClick(movie)}>
+                Listeye Ekle
+              </button>
+            )}
+
             <button
               className="btn btn-danger"
               onClick={() => setSelectedMovie()}
