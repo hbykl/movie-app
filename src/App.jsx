@@ -15,12 +15,15 @@ export default function App() {
   useEffect(
     function () //first render
     {
+      const controller = new AbortController();
+      const signal = controller.signal;
       async function getMovies() {
         try {
           setLoading(true);
           setError("");
           const res = await fetch(
-            `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`
+            `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${query}`,
+            { signal: signal }
           );
           if (!res.ok) {
             throw new Error("Bilinmeyen bir hata oluştu");
@@ -31,8 +34,11 @@ export default function App() {
           }
           setMovies(data.results);
         } catch (e) {
-          console.log(e.message);
-          setError(e.message);
+          if (e.name === "AbortError") {
+            console.log(e.message);
+          } else {
+            setError(e.message);
+          }
         }
         setLoading(false);
       }
@@ -42,6 +48,9 @@ export default function App() {
         return;
       }
       getMovies();
+      return () => {
+        controller.abort();
+      };
     },
     [query]
   );
