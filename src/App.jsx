@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
-
+import StarRating from "./StarRating";
 const api_key = "242fc01a5db5c09e93d411a0770051e3";
 
 export default function App() {
@@ -10,6 +10,7 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rate, setRate] = useState("");
 
   useEffect(
     function () //first render
@@ -54,6 +55,14 @@ export default function App() {
       setSelectedMovie();
     }
   };
+  const handleClickwithRate = (movie) => {
+    const newMovie = {
+      ...movie,
+      rate,
+    };
+    handleClickMovie(newMovie);
+    setRate("0");
+  };
 
   const handleSelectMovie = (movie) => {
     selectedMovie === movie ? setSelectedMovie() : setSelectedMovie(movie);
@@ -94,9 +103,10 @@ export default function App() {
             {selectedMovie ? (
               <AskSelected
                 movie={selectedMovie}
-                onClick={handleClickMovie}
                 setSelectedMovie={setSelectedMovie}
                 selectedMovies={selectedMovies}
+                setRate={setRate}
+                handleClickwithRate={handleClickwithRate}
               />
             ) : (
               <SelectedMovieList
@@ -249,17 +259,25 @@ function Movie({ movie, selectedMovies, selectedMovie, handleSelectMovie }) {
 function SelectedDetails({ selectedMovies, setSelectedMovies }) {
   const getAvg = (array) =>
     array.reduce((sum, value) => sum + value / array.length, 0);
+  const getUserAvg = (array) =>
+    array.reduce((sum, value) => sum + value / array.length, 0);
   return (
     <div className="card mb-2">
       <div className="card-body">
         <h5>Listede {selectedMovies.length} film bulunmaktadır.</h5>
-        <div className=" d-flex justify-content-between">
+        <div className=" d-flex justify-content-between ">
           <p>
             <i className="bi bi-star-fill text-warning me-1"></i>
             <span>
               {getAvg(
                 selectedMovies.map((movies) => movies.vote_average)
               ).toFixed(2)}
+            </span>
+          </p>
+          <p>
+            <i className="bi bi-stars text-warning me-1"></i>
+            <span>
+              {getAvg(selectedMovies.map((movies) => movies.rate)).toFixed(2)}
             </span>
           </p>
           <button
@@ -305,7 +323,7 @@ function SelectedMovie({ movie, handleDeleteMovie }) {
               <span>{movie.vote_average}</span>
             </p>
             <button
-              className="btn btn-danger pt-1 pb-1"
+              className="btn btn-danger pt-1 pb-1 "
               onClick={() => handleDeleteMovie(movie.id)}
             >
               Sil
@@ -317,11 +335,18 @@ function SelectedMovie({ movie, handleDeleteMovie }) {
   );
 }
 
-function AskSelected({ movie, setSelectedMovie, onClick, selectedMovies }) {
+function AskSelected({
+  movie,
+  setSelectedMovie,
+  handleClickwithRate,
+  selectedMovies,
+  setRate,
+}) {
+  const selectedRate = selectedMovies.find((m) => m.id === movie.id)?.rate;
   return (
     <div className="card mb-2">
-      <div className="row">
-        <div className="col-4">
+      <div className="col">
+        <div className="row">
           <img
             src={
               movie.poster_path
@@ -332,7 +357,7 @@ function AskSelected({ movie, setSelectedMovie, onClick, selectedMovies }) {
             className="img-fluid rounded-start"
           />
         </div>
-        <div className="col-8 ">
+        <div className="row m-3">
           <div className="card-body">
             <h6 className="card-title">{movie.title}</h6>
             <p>
@@ -348,11 +373,20 @@ function AskSelected({ movie, setSelectedMovie, onClick, selectedMovies }) {
               ))}
             </p>
           </div>
-          <div className="d-flex justify-content-between me-2">
+          <div className="mb-3">
+            <StarRating size={"20"} maxRating={10} onRating={setRate} />
+          </div>
+          <div className="d-flex justify-content-between ">
             {selectedMovies.some((m) => m.id == movie.id) ? (
-              <p>Film Listenizde Bulunmaktadır.</p>
+              <p>
+                Film Listenizde Bulunmaktadır. Değerlendirmeniz:{" "}
+                {selectedRate ? selectedRate : "0"}
+              </p>
             ) : (
-              <button className="btn btn-info" onClick={() => onClick(movie)}>
+              <button
+                className="btn btn-info"
+                onClick={() => handleClickwithRate(movie)}
+              >
                 Listeye Ekle
               </button>
             )}

@@ -12,7 +12,7 @@ const itemContainerStyle = {
 };
 const textStyle = {
   margin: "0",
-  fontSize: "2rem",
+  fontSize: "1rem",
 };
 StarRating.propTypes = {
   maxRating: PropTypes.number,
@@ -23,9 +23,14 @@ export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
   size = "36",
+  onRating,
 }) {
   const [click, setClick] = useState(0);
   const [onHover, SetOnHover] = useState(0);
+  const handleSetRating = (click) => {
+    setClick(click);
+    onRating(click);
+  };
   return (
     <div style={containerStyle}>
       <div style={itemContainerStyle}>
@@ -34,7 +39,7 @@ export default function StarRating({
             fill={onHover ? onHover >= i + 1 : click >= i + 1}
             color={color}
             size={size}
-            onRating={() => setClick(i + 1)}
+            onRating={() => handleSetRating(i + 1)}
             onHoverEnter={() => SetOnHover(i + 1)}
             onHoverLeave={() => SetOnHover(0)}
             key={i}
