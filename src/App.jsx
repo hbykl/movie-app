@@ -2,10 +2,14 @@ import { useEffect } from "react";
 import { useState } from "react";
 import StarRating from "./StarRating";
 import useMovies from "./hooks/useMovies";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 export default function App() {
   const [query, setQuery] = useState("film");
-  const [selectedMovies, setSelectedMovies] = useState([]);
+  const [selectedMovies, setSelectedMovies] = useLocalStorage(
+    [],
+    "selectedMovies"
+  );
   const [selectedMovie, setSelectedMovie] = useState();
   const [rate, setRate] = useState("");
 
